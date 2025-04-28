@@ -1,1 +1,1 @@
-# CGPA.com
+[# CGPA.com](https://gpacgpasec.netlify.app/)
