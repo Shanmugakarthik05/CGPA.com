@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA Calculator</title>
+    <style>
+        /* === Modern, Responsive Design === */
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --danger-color: #e74c3c;
+            --danger-dark: #c0392b;
+            --success-color: #2ecc71;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --medium-gray: #ddd;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-gray);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .calculator-container {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        
+        /* === Form Elements === */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        /* === Buttons === */
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--danger-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: var(--white);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        /* === Semester and Course Cards === */
+        .semester {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .course {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 3px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        /* === Results Display === */
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e8f4fc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        
+        /* === Utility Classes === */
+        .hidden {
+            display: none;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-3 {
+            margin-top: 15px;
+        }
+        
+        .mb-3 {
+            margin-bottom: 15px;
+        }
+        
+        /* === Responsive Design === */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .calculator-container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .course {
+                padding: 10px;
+            }
+            
+            input, select {
+                padding: 8px;
+            }
+        }
+        
+        /* === Animation === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* === Grade Info Table === */
+        .grade-info {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+        
+        .grade-info th, .grade-info td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .grade-info th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .grade-info tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-container">
+            <h1>CGPA Calculator</h1>
+            <p class="text-center mb-3">Calculate your Cumulative Grade Point Average across multiple semesters</p>
+            
+            <table class="grade-info">
+                <thead>
+                    <tr>
+                        <th>Grade</th>
+                        <th>GPA</th>
+                        <th>CGPA Range</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A+</td>
+                        <td>4.0</td>
+                        <td>> 8.5</td>
+                        <td>85 - 100</td>
+                    </tr>
+                    <tr>
+                        <td>A+</td>
+                        <td>3.7</td>
+                        <td>8.0 - 8.4</td>
+                        <td>80 - 84</td>
+                    </tr>
+                    <tr>
+                        <td>B+</td>
+                        <td>3.3</td>
+                        <td>7.5 - 7.9</td>
+                        <td>75 - 79</td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>3.0</td>
+                        <td>7.0 - 7.4</td>
+                        <td>70 - 74</td>
+                    </tr>
+                    <tr>
+                        <td>B-</td>
+                        <td>2.7</td>
+                        <td>6.5 - 6.9</td>
+                        <td>65 - 69</td>
+                    </tr>
+                    <tr>
+                        <td>C+</td>
+                        <td>2.3</td>
+                        <td>6.0 - 6.4</td>
+                        <td>60 - 64</td>
+                    </tr>
+                    <tr>
+                        <td>C</td>
+                        <td>2.0</td>
+                        <td>5.5 - 5.9</td>
+                        <td>55 - 59</td>
+                    </tr>
+                    <tr>
+                        <td>C-</td>
+                        <td>1.7</td>
+                        <td>5.0 - 5.4</td>
+                        <td>50 - 54</td>
+                    </tr>
+                    <tr>
+                        <td>D</td>
+                        <td>1.3</td>
+                        <td>4.5 - 4.9</td>
+                        <td>45 - 49</td>
+                    </tr>
+                    <tr>
+                        <td>D</td>
+                        <td>1.0</td>
+                        <td>4.0 - 4.4</td>
+                        <td>40 - 44</td>
+                    </tr>
+                    <tr>
+                        <td>F</td>
+                        <td>0.0</td>
+                        <td>0 - 3.9</td>
+                        <td>0 - 39</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="form-group">
+                <label for="semester-count">Number of Semesters:</label>
+                <input type="number" id="semester-count" min="1" value="1">
+            </div>
+            
+            <button id="setup-semesters" class="btn btn-primary btn-block">Setup Semesters</button>
+            
+            <div id="semesters-container"></div>
+            
+            <div id="results-container" class="hidden">
+                <div class="result fade-in">
+                    <h2>Results</h2>
+                    <p>Your CGPA: <span class="result-value" id="cgpa-result">0.00</span></p>
+                    <p>Equivalent Percentage: <span class="result-value" id="percentage-result">0%</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // === DOM Elements ===
+            const semesterCountInput = document.getElementById('semester-count');
+            const setupSemestersBtn = document.getElementById('setup-semesters');
+            const semestersContainer = document.getElementById('semesters-container');
+            const resultsContainer = document.getElementById('results-container');
+            const cgpaResult = document.getElementById('cgpa-result');
+            const percentageResult = document.getElementById('percentage-result');
+            
+            // === Data Model ===
+            let semesters = [];
+            
+            // === Grade Scale ===
+            const gradeScale = [
+                { grade: 'A+', value: 4.0, cgpaMin: 8.5, percentageMin: 85, percentageMax: 100 },
+                { grade: 'A+', value: 3.7, cgpaMin: 8.0, percentageMin: 80, percentageMax: 84 },
+                { grade: 'B+', value: 3.3, cgpaMin: 7.5, percentageMin: 75, percentageMax: 79 },
+                { grade: 'B', value: 3.0, cgpaMin: 7.0, percentageMin: 70, percentageMax: 74 },
+                { grade: 'B-', value: 2.7, cgpaMin: 6.5, percentageMin: 65, percentageMax: 69 },
+                { grade: 'C+', value: 2.3, cgpaMin: 6.0, percentageMin: 60, percentageMax: 64 },
+                { grade: 'C', value: 2.0, cgpaMin: 5.5, percentageMin: 55, percentageMax: 59 },
+                { grade: 'C-', value: 1.7, cgpaMin: 5.0, percentageMin: 50, percentageMax: 54 },
+                { grade: 'D', value: 1.3, cgpaMin: 4.5, percentageMin: 45, percentageMax: 49 },
+                { grade: 'D', value: 1.0, cgpaMin: 4.0, percentageMin: 40, percentageMax: 44 },
+                { grade: 'F', value: 0.0, cgpaMin: 0.0, percentageMin: 0, percentageMax: 39 }
+            ];
+            
+            // === Event Listeners ===
+            setupSemestersBtn.addEventListener('click', setupSemesters);
+            
+            // === Functions ===
+            
+            // Initialize semesters based on user input
+            function setupSemesters() {
+                const semesterCount = parseInt(semesterCountInput.value);
+                
+                if (isNaN(semesterCount) || semesterCount < 1) {
+                    alert('Please enter a valid number of semesters (at least 1)');
+                    return;
+                }
+                
+                semestersContainer.innerHTML = '';
+                semesters = [];
+                
+                for (let i = 0; i < semesterCount; i++) {
+                    addSemester(i);
+                }
+                
+                resultsContainer.classList.add('hidden');
+            }
+            
+            // Add a semester to the UI and data model
+            function addSemester(semesterIndex) {
+                const semesterDiv = document.createElement('div');
+                semesterDiv.className = 'semester fade-in';
+                semesterDiv.innerHTML = `
+                    <h3>Semester ${semesterIndex + 1}</h3>
+                    <div class="form-group">
+                        <button class="btn btn-primary add-course" data-semester="${semesterIndex}">Add Course</button>
+                    </div>
+                    <div class="courses-container" id="courses-container-${semesterIndex}"></div>
+                    <div class="semester-result hidden mt-3">
+                        <p>Semester GPA: <span class="result-value gpa-result">0.00</span></p>
+                    </div>
+                `;
+                
+                semestersContainer.appendChild(semesterDiv);
+                semesters.push({ courses: [] });
+                
+                // Add event listener for the add course button
+                semesterDiv.querySelector('.add-course').addEventListener('click', function() {
+                    addCourse(this.dataset.semester);
+                });
+            }
+            
+            // Add a course to a semester
+            function addCourse(semesterIndex) {
+                const semester = semesters[semesterIndex];
+                const courseId = semester.courses.length;
+                
+                semester.courses.push({
+                    creditHours: 3,  // Default value
+                    grade: '4.0'     // Default to A+
+                });
+                
+                const coursesContainer = document.getElementById(`courses-container-${semesterIndex}`);
+                const courseDiv = document.createElement('div');
+                courseDiv.className = 'course fade-in';
+                courseDiv.innerHTML = `
+                    <h4>Course ${courseId + 1}</h4>
+                    <div class="form-group">
+                        <label for="credit-${semesterIndex}-${courseId}">Credit Hours:</label>
+                        <input type="number" id="credit-${semesterIndex}-${courseId}" min="0.5" step="0.5" value="3" class="credit-input" data-semester="${semesterIndex}" data-course="${courseId}">
+                    </div>
+                    <div class="form-group">
+                        <label for="grade-${semesterIndex}-${courseId}">Grade:</label>
+                        <select id="grade-${semesterIndex}-${courseId}" class="grade-input" data-semester="${semesterIndex}" data-course="${courseId}">
+                            <option value="4.0">A+ (4.0)</option>
+                            <option value="3.7">A+ (3.7)</option>
+                            <option value="3.3">B+ (3.3)</option>
+                            <option value="3.0">B (3.0)</option>
+                            <option value="2.7">B- (2.7)</option>
+                            <option value="2.3">C+ (2.3)</option>
+                            <option value="2.0">C (2.0)</option>
+                            <option value="1.7">C- (1.7)</option>
+                            <option value="1.3">D (1.3)</option>
+                            <option value="1.0">D (1.0)</option>
+                            <option value="0.0">F (0.0)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-danger remove-course" data-semester="${semesterIndex}" data-course="${courseId}">Remove Course</button>
+                `;
+                
+                coursesContainer.appendChild(courseDiv);
+                
+                // Add event listeners for inputs
+                courseDiv.querySelector('.credit-input').addEventListener('change', updateCalculations);
+                courseDiv.querySelector('.grade-input').addEventListener('change', updateCalculations);
+                courseDiv.querySelector('.remove-course').addEventListener('click', function() {
+                    removeCourse(this.dataset.semester, this.dataset.course);
+                });
+                
+                updateCalculations();
+            }
+            
+            // Remove a course from a semester
+            function removeCourse(semesterIndex, courseId) {
+                semesters[semesterIndex].courses.splice(courseId, 1);
+                renderCourses(semesterIndex);
+                updateCalculations();
+            }
+            
+            // Re-render courses after removal
+            function renderCourses(semesterIndex) {
+                const coursesContainer = document.getElementById(`courses-container-${semesterIndex}`);
+                coursesContainer.innerHTML = '';
+                
+                semesters[semesterIndex].courses.forEach((course, courseId) => {
+                    const courseDiv = document.createElement('div');
+                    courseDiv.className = 'course fade-in';
+                    courseDiv.innerHTML = `
+                        <h4>Course ${courseId + 1}</h4>
+                        <div class="form-group">
+                            <label for="credit-${semesterIndex}-${courseId}">Credit Hours:</label>
+                            <input type="number" id="credit-${semesterIndex}-${courseId}" min="0.5" step="0.5" value="${course.creditHours || 3}" class="credit-input" data-semester="${semesterIndex}" data-course="${courseId}">
+                        </div>
+                        <div class="form-group">
+                            <label for="grade-${semesterIndex}-${courseId}">Grade:</label>
+                            <select id="grade-${semesterIndex}-${courseId}" class="grade-input" data-semester="${semesterIndex}" data-course="${courseId}">
+                                <option value="4.0" ${course.grade === '4.0' ? 'selected' : ''}>A+ (4.0)</option>
+                                <option value="3.7" ${course.grade === '3.7' ? 'selected' : ''}>A+ (3.7)</option>
+                                <option value="3.3" ${course.grade === '3.3' ? 'selected' : ''}>B+ (3.3)</option>
+                                <option value="3.0" ${course.grade === '3.0' ? 'selected' : ''}>B (3.0)</option>
+                                <option value="2.7" ${course.grade === '2.7' ? 'selected' : ''}>B- (2.7)</option>
+                                <option value="2.3" ${course.grade === '2.3' ? 'selected' : ''}>C+ (2.3)</option>
+                                <option value="2.0" ${course.grade === '2.0' ? 'selected' : ''}>C (2.0)</option>
+                                <option value="1.7" ${course.grade === '1.7' ? 'selected' : ''}>C- (1.7)</option>
+                                <option value="1.3" ${course.grade === '1.3' ? 'selected' : ''}>D (1.3)</option>
+                                <option value="1.0" ${course.grade === '1.0' ? 'selected' : ''}>D (1.0)</option>
+                                <option value="0.0" ${course.grade === '0.0' ? 'selected' : ''}>F (0.0)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-danger remove-course" data-semester="${semesterIndex}" data-course="${courseId}">Remove Course</button>
+                    `;
+                    
+                    coursesContainer.appendChild(courseDiv);
+                    
+                    // Add event listeners for inputs
+                    courseDiv.querySelector('.credit-input').addEventListener('change', updateCalculations);
+                    courseDiv.querySelector('.grade-input').addEventListener('change', updateCalculations);
+                    courseDiv.querySelector('.remove-course').addEventListener('click', function() {
+                        removeCourse(this.dataset.semester, this.dataset.course);
+                    });
+                });
+            }
+            
+            // Calculate percentage from CGPA
+            function calculatePercentage(cgpa) {
+                for (const grade of gradeScale) {
+                    if (cgpa >= grade.cgpaMin) {
+                        // Linear interpolation within the grade band
+                        if (grade.cgpaMin === 8.5) {
+                            return Math.min(100, 85 + ((cgpa - 8.5) * 30));
+                        }
+                        const nextGrade = gradeScale[gradeScale.indexOf(grade) - 1] || { cgpaMin: 10 };
+                        if (cgpa < nextGrade.cgpaMin) {
+                            const range = nextGrade.cgpaMin - grade.cgpaMin;
+                            const position = (cgpa - grade.cgpaMin) / range;
+                            return Math.round(grade.percentageMin + position * (grade.percentageMax - grade.percentageMin));
+                        }
+                    }
+                }
+                return 0;
+            }
+            
+            // Update all calculations when inputs change
+            function updateCalculations() {
+                // Update the data model first
+                document.querySelectorAll('.credit-input').forEach(input => {
+                    const semesterIndex = input.dataset.semester;
+                    const courseId = input.dataset.course;
+                    semesters[semesterIndex].courses[courseId].creditHours = parseFloat(input.value) || 0;
+                });
+                
+                document.querySelectorAll('.grade-input').forEach(input => {
+                    const semesterIndex = input.dataset.semester;
+                    const courseId = input.dataset.course;
+                    semesters[semesterIndex].courses[courseId].grade = input.value;
+                });
+                
+                // Calculate semester GPAs and cumulative totals
+                let totalCredits = 0;
+                let totalGradePoints = 0;
+                
+                semesters.forEach((semester, semesterIndex) => {
+                    let semesterCredits = 0;
+                    let semesterGradePoints = 0;
+                    
+                    semester.courses.forEach(course => {
+                        const credits = parseFloat(course.creditHours) || 0;
+                        const grade = parseFloat(course.grade) || 0;
+                        
+                        semesterCredits += credits;
+                        semesterGradePoints += credits * grade;
+                    });
+                    
+                    // Update semester GPA display
+                    const semesterGPA = semesterCredits > 0 ? (semesterGradePoints / semesterCredits) : 0;
+                    const semesterDiv = semestersContainer.children[semesterIndex];
+                    const resultDiv = semesterDiv.querySelector('.semester-result');
+                    const gpaSpan = semesterDiv.querySelector('.gpa-result');
+                    
+                    gpaSpan.textContent = semesterGPA.toFixed(2);
+                    resultDiv.classList.remove('hidden');
+                    
+                    // Add to cumulative totals
+                    totalCredits += semesterCredits;
+                    totalGradePoints += semesterGradePoints;
+                });
+                
+                // Calculate and display CGPA and percentage
+                if (totalCredits > 0) {
+                    const cgpa = totalGradePoints / totalCredits;
+                    const percentage = calculatePercentage(cgpa * 2); // Multiply by 2 to convert to 10-point scale
+                    
+                    cgpaResult.textContent = cgpa.toFixed(2);
+                    percentageResult.textContent = percentage + '%';
+                    resultsContainer.classList.remove('hidden');
+                } else {
+                    resultsContainer.classList.add('hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
